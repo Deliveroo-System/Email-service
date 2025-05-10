@@ -1,18 +1,14 @@
-# Base image
-FROM node:18
-
-# Create app directory
+# Build stage
+FROM node:18-slim as builder
 WORKDIR /app
-
-# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
-
-# Copy app source
+RUN npm install --omit=dev
 COPY . .
 
-# Expose the port
-EXPOSE 5045
+# Run stage
+FROM node:18-slim
+WORKDIR /app
+COPY --from=builder /app .
 
-# Start the application
-CMD ["npm", "start"]
+EXPOSE 5045
+CMD ["node", "servers.js"]
