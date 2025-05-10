@@ -1,0 +1,36 @@
+name: CI for Email Service
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the Email Service repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: (Optional) Clone Kubernetes Config Repository
+      - name: Clone Kubernetes Config Repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'Deliveroo-System/ds-project-kubernetes'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+          path: kubernetes
+
+      # Step 3: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      # Step 4: Build Docker image for Email Service
+      - name: Build Docker image
+        run: docker build -f Dockerfile -t vidura12/deliveroo:email-service-latest .
+
+      # Step 5: Push Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: docker push vidura12/deliveroo:email-service-latest
