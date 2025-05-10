@@ -1,12 +1,26 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
-const notificationRoute = require('./routes/notificationRoute');
 
-require("dotenv").config();
+// Enable CORS for your frontend origin
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // if using cookies or sessions
+}));
 
-app.use(express.json()); // Parse JSON bodies
+// Body parser middleware
+app.use(express.json());
 
-app.use('/api/notification', notificationRoute);
+// Routes
+app.post('/api/notification/payment-success', (req, res) => {
+  const { customerEmail } = req.body;
+  console.log(`Sending payment confirmation to: ${customerEmail}`);
+  // Simulate success
+  res.status(200).json({ message: 'Email sent successfully' });
+});
 
-const PORT = process.env.PORT || 5045;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server
+app.listen(5045, () => {
+  console.log('Server running on http://localhost:5045');
+});
